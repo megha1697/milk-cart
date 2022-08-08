@@ -1,0 +1,240 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Milk Cart
+  description: CRED operations to manage Milk Cart
+paths:
+  /:
+    get:
+      summary: returns capacity available for the day
+      tags:
+        - MilkCart
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                      orderId: 
+                        type: number
+                        example: 1
+                      quantity:
+                        type: number
+                        example: 10
+                      deliveryLocation:
+                        type: object
+                        properties:
+                          street:
+                            type: string
+                          city:
+                            type: string
+                          state:
+                            type: string
+                          country:
+                            type: string
+                      createdAt: 
+                        type: string
+                      updatedAt: 
+                        type: string
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /add:
+    post:
+      summary: create a new order.
+      tags:
+        - MilkCart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                  quantity:
+                    type: number
+                    description: quantity of milk in liters.
+                    example: 2
+                  deliveryLocation:
+                    type: object
+                    properties:
+                      street:
+                        type: string
+                      city:
+                        type: string
+                      state:
+                        type: string
+                      country:
+                        type: string
+                    description: address of the location to deliver milk
+                    example: HNo-2, area-banglore, city-banglore, state-karnataka
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Order added successfully with orderId - 1
+        '400':
+          $ref: '#/components/responses/NotFoundError'
+  /update/{id}:
+    patch:
+      summary: update order details.
+      tags:
+        - MilkCart
+      parameters: 
+        - $ref: '#/components/parameters/path-id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                  quantity:
+                    type: number
+                    description: quantity of milk in liters.
+                    example: 2
+                  deliveryLocation:
+                    type: object
+                    properties:
+                      street:
+                        type: string
+                      city:
+                        type: string
+                      state:
+                        type: string
+                      country:
+                        type: string
+                    description: address of the location to deliver milk
+                    example: HNo-2, area-banglore, city-banglore, state-karnataka
+      responses:
+        '200':
+          description: Success
+          content:
+             application/json:
+              schema:
+                type: string
+                example: Order added successfully with orderId - 1
+        '400':
+          $ref: '#/components/responses/NotFoundError'
+  /delete/{id}:
+    delete:
+      summary: deletes the order with given orderID.
+      tags:
+        - MilkCart
+      parameters:
+        - $ref: '#/components/parameters/path-id'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orderId: 
+                    type: number
+                    example: 1
+                  quantity:
+                    type: number
+                    example: 10
+                  deliveryLocation:
+                    type: object
+                    properties:
+                      street:
+                        type: string
+                      city:
+                        type: string
+                      state:
+                        type: string
+                      country:
+                        type: string
+                  createdAt: 
+                    type: string
+                  updatedAt: 
+                    type: string
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /updateStatus/{id}:
+    patch:
+      summary: API to perform patch requests to update order status
+      tags:
+        - MilkCart
+      parameters:
+        - $ref: '#/components/parameters/path-id'
+      requestBody:
+        required: true
+        content:
+         application/json:
+          schema: 
+            properties: 
+              status: 
+                type: string
+                enum:
+                  - placed
+                  - packed 
+                  - dispatched
+                  - delivered
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Order status updated Successfully
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /checkCapacity:
+    get:
+      summary: returns capacity available for the day
+      tags:
+        - MilkCart
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+                example: Total capacity for today is 2 liters
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  responses:
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: string
+            example: Internal server Error
+    NotFoundError:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            type: string
+            example: Order Not Found
+    ValidationError:
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            type: string
+            example: Invalid data / Invalid Updates
+  parameters:
+    path-id:
+      in: path
+      name: id
+      schema:
+        type: string
+      description: The orderId
+      required: true
